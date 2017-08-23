@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+<div id="contenteditable" contenteditable="true" style="width: 500px; height: 300px">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+
+<script src='//cdn.tinymce.com/4/tinymce.js'></script>
+<script src="realtime-grammar-plugin.js"></script>
+<script>
+
+    tinymce.init({
+        selector : '#contenteditable',
+        plugins: ["paste", "realtime"],
+
+        realtime : {
+            service : {
+                i18n : { en : "/i18n-en.js" },
+                //sourcePath : "http://localhost:8080/bundle.js",
+                //userId : '1231231321231231321',
+                apiKey: 'E8FEF7AE-3F36-4EAF-A451-456D05E6F2A3'
+            },
+            grammar : {
+                //checkStyle, checkGrammar etc
+            }
+        },
+
+        toolbar: [
+            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | realtime"
+        ]
+    });
+
+</script>
+
+<div>
+
+    <p>I awake, and, just for <span class="pwa pwa1 pwa-color pwa-blue" data-report="grammar" data-suggestions="a moment" data-index="2" data-category="grammargrammar" data-sub-category="an moment" data-urls="" data-help="INDEFINITE_ARTICLE" data-original-text="an moment" data-tag-id="6d007f43-8c59-4f33-8ef3-6927ddadbe70" pwa-tag="" pwa-editor-id="" data-x-title="Should you be using 'a' instead? Use 'an' before a word that starts with a vowel sound. Some words may start with a vowel that isn't sounded as a vowel.">an moment</span>, I have forgotten the pain. I very slowly open my eyes and reach for my cane that always hangs at my side. You can imagine how hard it must be to get in and out of a hammock at my age. I need all the help I can get. Every day the weariness is even <span class="pwa pwa1 pwa-color pwa-blue" data-report="grammar" data-suggestions="worse" data-index="3" data-category="grammargrammar" data-sub-category="worst" data-urls="" data-help="IS_EVEN_WORST" data-original-text="worst" data-tag-id="9f33b798-2f26-4b12-bf02-b001e19fb4e1" pwa-tag="" pwa-editor-id="" data-x-title="Probably incorrect use of superlative 'worst'. Consider using the comparative form instead.">worst</span> than <span class="pwa pwa2 pwa-color pwa-red" data-report="grammar" data-suggestions="before,Bavaria" data-index="11" data-category="grammarspelling" data-sub-category="beofre" data-urls="" data-help="SIMPLE_SPELLING" data-original-text="beofre" data-tag-id="cf9b7ede-6c7c-4b59-bb28-180e22361db0" pwa-tag="" pwa-editor-id="" data-x-title="Unknown word: beofre">beofre</span>. Could this be my last <span class="pwa pwa1 pwa-color pwa-blue" data-report="grammar" data-suggestions="day?" data-index="4" data-category="grammargrammar" data-sub-category="day." data-urls="" data-help="QUESTION_DETECTION" data-original-text="day." data-tag-id="d0ed72b0-6fba-46fa-8b5e-2d92c52ec222" pwa-tag="" pwa-editor-id="" data-x-title="Possible Wrong Punctuation">day.</span> One day I hope I will awake, rejuvenated by some ghost-demon magic, or dead, either one would be a relief. Sometimes I dream of my hammock as a cocoon from which I shall emerge, reborn, a beautiful butterfly, but it is only a dream. Dreams set me free. The irony is that, between the pain of my joints and the weakness of my bladder, I don’t have many dreams; even empty sleep is a welcome luxury.</p>
+
+</div>
+
+</body>
+</html>

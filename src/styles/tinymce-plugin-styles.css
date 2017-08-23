@@ -1,0 +1,24 @@
+.mce-i-realtime-grammar-toolbar-icon-16{
+    width: 16px !important;
+    height: 16px !important;
+    background-size: 16px 16px !important;
+    background: url(../icons/realtime-logo-black-16.png) no-repeat 0 0 !important;
+}
+
+.mce-i-realtime-grammar-toolbar-icon-16.loading {
+    animation: realtime-grammar-toolbar-icon-loading-animation 1s ease infinite;
+}
+
+@keyframes realtime-grammar-toolbar-icon-loading-animation {
+    0%, 100%{
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* TODO add vendor prefixes */
