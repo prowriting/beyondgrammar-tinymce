@@ -27,6 +27,7 @@ build_script:
   
 artifacts:
   - path: dist/realtime-grammar-plugin.js
+  - path: dist/i18n-en.js
 
 notifications:
 - provider: Slack
