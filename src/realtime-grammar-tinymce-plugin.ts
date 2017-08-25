@@ -111,19 +111,22 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             let $win = $(settingsWindow.$el[0]);
             let $find = (query)=>$(settingsWindow.$.find(query, settingsWindow.$el[0])[0]);
             
-            let $dictionaryContainer = $find("#dictionary-contents-container>.mce-container-body");// $(settingsWindow.$.find("#dictionary-contents-container>.mce-container-body", settingsWindow.$el[0])[0]);
-            let $replaceContainer = $find("#replace-contents-container>.mce-container-body");
-            let $addDictionaryBtn = $find("#dictionary-add-button");
+            //let $dictionaryContainer = $find("#dictionary-contents-container>.mce-container-body");// $(settingsWindow.$.find("#dictionary-contents-container>.mce-container-body", settingsWindow.$el[0])[0]);
+            //let $replaceContainer = $find("#replace-contents-container>.mce-container-body");
+            //let $addDictionaryBtn = $find("#dictionary-add-button");
             
+            let dictionaryController = new DictionaryController(settingsWindow, this.grammarChecker, $win, false);
+            let replaceController = new DictionaryController(settingsWindow, this.grammarChecker, $win, true);
             
             settingsWindow.on('submit', (e)=>{
                 this.grammarChecker.setSettings( e.data );
+                
             });
             
             let $dictionaryListbox;
             let $replaceListbox;
             
-            let reInitUI = ()=>{
+            /*let reInitUI = ()=>{
                 $win.off("click", "#dictionary-add-button");
                 
                 $win.on("click", "#dictionary-add-button", ()=>{
@@ -135,31 +138,142 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 //$addDictionaryBtn.on('click', ()=>{
                     
                 //});
-            };
+            };*/
             
-            let reloadDictionary = ()=>this.grammarChecker
+            /*let reloadDictionary = ()=>this.grammarChecker
                 .getDictionaryEntries()
                 .then(( entries =>{
-                    $replaceListbox = createListBox( entries.filter(e=>!!e.Replacement) );
-                    $dictionaryListbox = createListBox( entries.filter(e=>!e.Replacement) );
-                    
-                    $dictionaryContainer.empty().append( $dictionaryListbox );
-                    $replaceContainer.empty().append( $replaceListbox );
+                   //$replaceListbox = createListBox( entries.filter(e=>!!e.Replacement) );
+                   //$dictionaryListbox = createListBox( entries.filter(e=>!e.Replacement) );
+                   //
+                   //$dictionaryContainer.empty().append( $dictionaryListbox );
+                   //$replaceContainer.empty().append( $replaceListbox );
                     
                     reInitUI();
-                }));
+                }));*/
             
-            let createListBox = (items : DictionaryEntry[])=>$("<select>")
+            /*let createListBox = (items : DictionaryEntry[])=>$("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
                 .attr({ multiple : false, size : 10 })
                 .append(items.map(i=>{
                    return $("<option>").attr("id", i.Id ).text( `${i.Word} ${ i.Replacement? `( Replace with "${i.Replacement}")` : "" }` ) 
-                }));
+                }));*/
                 
             
-            reloadDictionary();
+            //reloadDictionary();
         }
     }
     
+    class DictionaryController {
+        private PREFIX : string;
+        private $itemContainer : JQuery;
+        private $listBox : JQuery;
+        
+        private $entryInput : JQuery;
+        private $addButton : JQuery;
+        private $deleteButton : JQuery;
+        
+        private lastLoadedEntries : DictionaryEntry[] = [];
+        
+        constructor(private tinymceWindow : any, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
+            this.PREFIX = isReplace ? "replace" : "dictionary";
+            this.initUI();
+            this.reloadDictionary(true);
+        }
+        
+        private initUI(){
+            this.$itemContainer = this.$window.find(`#${this.PREFIX}-contents-container>.mce-container-body`);
+            this.$addButton = this.$window.find(`#${this.PREFIX}-add-button`);
+            this.$deleteButton = this.$window.find(`#${this.PREFIX}-delete-button`);
+            
+            this.$entryInput = this.$window.find(`#${this.PREFIX}-entry-textbox`);
+            
+            this.$listBox = $("<select>")
+                .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
+                .attr({ multiple : false, size : 10 })
+                .appendTo(this.$itemContainer);
+            
+            this.$addButton.on("click", ()=>this.addToDictionary() );
+            this.$deleteButton.on("click", ()=>this.deleteFromDictionary() );
+        }
+        
+        private addToDictionary(){
+            let word = this.$entryInput.val();
+            
+            if( !word ){
+                //TODO show alert
+                return;
+            }
+            
+            if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
+                //TODO show alert
+                return;
+            }
+            
+            this.$entryInput.val("");
+            
+            this.activateUI(false);
+            
+            this.grammarChecker
+                .addToDictionary(word)
+                .then(()=>this.reloadDictionary())
+                .then(()=>this.activateUI());
+        }
+        
+        private deleteFromDictionary(){
+            let id  = this.$listBox.val();
+
+            if( !id ) {
+                //TODO show alert
+                return;
+            }
+            
+            if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
+                //TODO show alert
+                return;
+            }
+            
+            this.activateUI(false);
+            
+            this.grammarChecker
+                .removeFromDictionary(id)
+                .then(()=>this.reloadDictionary())
+                .then(()=>this.activateUI())
+        }
+        
+        private reloadDictionary(changeUI : boolean = false){
+            if( changeUI )this.activateUI(false);
+            
+            return this.grammarChecker.getDictionaryEntries().then((entries)=>{
+                let items = entries.filter(e=>this.isReplace ? !!e.Replacement : !e.Replacement);
+                
+                this.$listBox.empty().append( items.map((item)=>{
+                    return $("<option>")
+                        .attr("value", item.Id )
+                        .text( `${item.Word} ${ item.Replacement? `( Replace with "${item.Replacement}")` : "" }` )
+                }));
+                
+                this.lastLoadedEntries = items;
+                
+                if(changeUI) this.activateUI();
+                
+                return items;
+            });
+        }
+        
+        private activateUI(active : boolean = true){
+            if( active ) {
+                //TODO
+            } else {
+                //TODO
+            }
+        }
+        
+        destroy(){
+            //TODO destroy
+        }
+        
+        
+    }
     
 });

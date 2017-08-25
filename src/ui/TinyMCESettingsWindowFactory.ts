@@ -84,24 +84,19 @@ export class TinyMCESettingsWindowFactory{
 
         
         //Editor block, entity/replace with / add inputs
-        if( replace ) {
-            editorBlock.items.push({
-                type : "container", layout:"stack", items : [
-                    {type : "label", text : "Replace"},//TODO i18n
-                    {type : "textbox", autoResize : true, width : input1width,}
-                ]});
 
+        editorBlock.items.push({
+            type : "container", layout : "stack", items : [
+                {type : "label", text : replace ? "Replace" : "Entity"},//TODO i18n
+                {type : "textbox" , id:`${idPrefix}-entry-textbox`, autoResize : true, width : input1width}
+            ]});
+        
+        if( replace ) {
             editorBlock.items.push({
                 type : "container", autoResize : true, width : input1width, layout:"stack", items : [
                     {type : "label", text : "With"},//TODO i18n
-                    {type : "textbox"}
+                    {type : "textbox", id : `${idPrefix}-replace-textbox` }
                 ]})
-        } else {
-            editorBlock.items.push({
-                type : "container", classes : "inputs-1", layout : "stack", items : [
-                    {type : "label", text : "Entity"},//TODO i18n
-                    {type : "textbox"}
-                ]});
         }
         
         editorBlock.items.push({
@@ -123,7 +118,7 @@ export class TinyMCESettingsWindowFactory{
                 
                 { type : "container", layout : "stack", items:[
                     { type : "label", text:"invisible", style:"color : transparent"},
-                    { type : "button", text : "Delete" } //TODO i18n
+                    { type : "button", id : `${idPrefix}-delete-button`, text : "Delete" } //TODO i18n
                 ]}
             ]
         };
