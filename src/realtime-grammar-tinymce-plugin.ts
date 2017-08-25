@@ -109,58 +109,15 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             let settingsWindow = editor.windowManager.open( descriptorObj );
             
             let $win = $(settingsWindow.$el[0]);
-            let $find = (query)=>$(settingsWindow.$.find(query, settingsWindow.$el[0])[0]);
             
-            //let $dictionaryContainer = $find("#dictionary-contents-container>.mce-container-body");// $(settingsWindow.$.find("#dictionary-contents-container>.mce-container-body", settingsWindow.$el[0])[0]);
-            //let $replaceContainer = $find("#replace-contents-container>.mce-container-body");
-            //let $addDictionaryBtn = $find("#dictionary-add-button");
-            
-            let dictionaryController = new DictionaryController(settingsWindow, this.grammarChecker, $win, false);
-            let replaceController = new DictionaryController(settingsWindow, this.grammarChecker, $win, true);
+            let dictionaryController = new DictionaryController(editor, this.grammarChecker, $win, false);
+            let replaceController = new DictionaryController(editor, this.grammarChecker, $win, true);
             
             settingsWindow.on('submit', (e)=>{
                 this.grammarChecker.setSettings( e.data );
-                
+                dictionaryController.destroy();
+                replaceController.destroy();
             });
-            
-            let $dictionaryListbox;
-            let $replaceListbox;
-            
-            /*let reInitUI = ()=>{
-                $win.off("click", "#dictionary-add-button");
-                
-                $win.on("click", "#dictionary-add-button", ()=>{
-                    //TODO lock interface
-                    
-                });
-                
-                //$addDictionaryBtn.off();
-                //$addDictionaryBtn.on('click', ()=>{
-                    
-                //});
-            };*/
-            
-            /*let reloadDictionary = ()=>this.grammarChecker
-                .getDictionaryEntries()
-                .then(( entries =>{
-                   //$replaceListbox = createListBox( entries.filter(e=>!!e.Replacement) );
-                   //$dictionaryListbox = createListBox( entries.filter(e=>!e.Replacement) );
-                   //
-                   //$dictionaryContainer.empty().append( $dictionaryListbox );
-                   //$replaceContainer.empty().append( $replaceListbox );
-                    
-                    reInitUI();
-                }));*/
-            
-            /*let createListBox = (items : DictionaryEntry[])=>$("<select>")
-                .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
-                .attr({ multiple : false, size : 10 })
-                .append(items.map(i=>{
-                   return $("<option>").attr("id", i.Id ).text( `${i.Word} ${ i.Replacement? `( Replace with "${i.Replacement}")` : "" }` ) 
-                }));*/
-                
-            
-            //reloadDictionary();
         }
     }
     
@@ -170,12 +127,13 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         private $listBox : JQuery;
         
         private $entryInput : JQuery;
+        private $replaceWithInput : JQuery;
         private $addButton : JQuery;
         private $deleteButton : JQuery;
         
         private lastLoadedEntries : DictionaryEntry[] = [];
         
-        constructor(private tinymceWindow : any, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
+        constructor(private editor : Editor, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
             this.PREFIX = isReplace ? "replace" : "dictionary";
             this.initUI();
             this.reloadDictionary(true);
@@ -187,6 +145,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             this.$deleteButton = this.$window.find(`#${this.PREFIX}-delete-button`);
             
             this.$entryInput = this.$window.find(`#${this.PREFIX}-entry-textbox`);
+            this.$replaceWithInput = this.$window.find(`#${this.PREFIX}-replace-textbox`);
             
             this.$listBox = $("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
@@ -201,35 +160,57 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             let word = this.$entryInput.val();
             
             if( !word ){
-                //TODO show alert
+                this.editor.windowManager.alert( `Please type ${this.isReplace ? "replace" : "entity"} for adding to dictionary` );
                 return;
             }
             
-            if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
-                //TODO show alert
+            if( !this.isReplace &&  this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
+                this.editor.windowManager.alert( "Entity already exists in the dictionary" );
+                return;
+            }
+            
+            let replaceWith = this.isReplace ? this.$replaceWithInput.val() : undefined;
+            
+            if( this.isReplace && !replaceWith ){
+                this.editor.windowManager.alert( "Please type replace for adding to dictionary" );
+                return;
+            }
+            
+            if( this.isReplace && this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase() && e.Replacement.toLowerCase() == replaceWith.toLowerCase()).length > 0 ){
+                this.editor.windowManager.alert(`Replacement "${word}=>${replaceWith}" already exists in the dictionary`);
+                return;
+            }
+            
+            if( this.isReplace && word == replaceWith ) {
+                this.editor.windowManager.alert("What sense to replace one word with the same?");
                 return;
             }
             
             this.$entryInput.val("");
+            this.$replaceWithInput.val("");
             
             this.activateUI(false);
             
             this.grammarChecker
-                .addToDictionary(word)
+                .addToDictionary(word, replaceWith)
                 .then(()=>this.reloadDictionary())
-                .then(()=>this.activateUI());
+                .then(()=>this.activateUI())
+                .catch(()=>{
+                    this.editor.windowManager.alert("Sorry! Error");
+                    this.activateUI();
+                })
         }
         
         private deleteFromDictionary(){
             let id  = this.$listBox.val();
 
             if( !id ) {
-                //TODO show alert
+                this.editor.windowManager.alert( "Please select item for delete" );
                 return;
             }
             
             if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
-                //TODO show alert
+                this.editor.windowManager.alert("Unknown Id for delete"); //[pavel] - im not sure this is good message
                 return;
             }
             
@@ -239,6 +220,10 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .removeFromDictionary(id)
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
+                .catch(()=>{
+                    this.editor.windowManager.alert("Sorry! Error");
+                    this.activateUI();
+                })
         }
         
         private reloadDictionary(changeUI : boolean = false){
@@ -250,7 +235,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 this.$listBox.empty().append( items.map((item)=>{
                     return $("<option>")
                         .attr("value", item.Id )
-                        .text( `${item.Word} ${ item.Replacement? `( Replace with "${item.Replacement}")` : "" }` )
+                        .text( `${item.Word}${ item.Replacement? ` => ${item.Replacement}` : "" }` )
                 }));
                 
                 this.lastLoadedEntries = items;
@@ -262,6 +247,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         }
         
         private activateUI(active : boolean = true){
+            //this.$addButton.
             if( active ) {
                 //TODO
             } else {
