@@ -2,6 +2,12 @@ import {ILanguage} from "./ILanguage";
 import {IGrammarCheckerSettings} from "./IGrammarCheckerSettings";
 import {IServiceSettings} from "./IServiceSettings";
 
+export class DictionaryEntry {
+    Id : string;
+    Word : string;
+    Replacement ?: string;
+}
+
 export interface IGrammarCheckerConstructor{
     new ( element : HTMLElement, serviceSettings : IServiceSettings, grammarCheckerSettings ?: IGrammarCheckerSettings ): IGrammarChecker;
 }
@@ -25,4 +31,8 @@ export interface IGrammarChecker {
     getVersionedApplicationName() : string;
     getCopyrightUrl() : string;
     getBrandImageUrl() : string;
+
+    addToDictionary( word : string, replacement ?: string ) : Promise<DictionaryEntry[]>;
+    removeFromDictionary( id : string ) : Promise<any>;
+    getDictionaryEntries() : Promise<DictionaryEntry[]>;
 }

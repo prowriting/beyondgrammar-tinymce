@@ -28,6 +28,8 @@ export class TinyMCESettingsWindowFactory{
 
         tabPanel.items.push( this.createLanguageTab(checker) );
         tabPanel.items.push( this.createOptionsTab() );
+        tabPanel.items.push( this.createDictionaryTab(checker, false, width, height) );
+        tabPanel.items.push( this.createDictionaryTab(checker, true, width, height) );
         tabPanel.items.push( this.createAboutTab(checker) );
 
         form.items.push(tabPanel);
@@ -69,6 +71,75 @@ export class TinyMCESettingsWindowFactory{
         }
     }
 
+    createDictionaryTab( checker : IGrammarChecker, replace : boolean, width : number, height : number ) {
+        let idPrefix = replace ? "replace" : "dictionary";
+        let editorBlock = {
+            type : "container",
+            layout : "flow",
+            items : <any>[]
+        };
+
+        let buttonWidth = width * 0.5;
+        let input1width = (width - buttonWidth)/2;
+
+        
+        //Editor block, entity/replace with / add inputs
+        if( replace ) {
+            editorBlock.items.push({
+                type : "container", layout:"stack", items : [
+                    {type : "label", text : "Replace"},//TODO i18n
+                    {type : "textbox", autoResize : true, width : input1width,}
+                ]});
+
+            editorBlock.items.push({
+                type : "container", autoResize : true, width : input1width, layout:"stack", items : [
+                    {type : "label", text : "With"},//TODO i18n
+                    {type : "textbox"}
+                ]})
+        } else {
+            editorBlock.items.push({
+                type : "container", classes : "inputs-1", layout : "stack", items : [
+                    {type : "label", text : "Entity"},//TODO i18n
+                    {type : "textbox"}
+                ]});
+        }
+        
+        editorBlock.items.push({
+            type : "container",layout : "stack", width : buttonWidth, classes :"button",
+            items : [
+                { type :"label", text:"Invisible", style:"color:transparent" },
+                { type: "button", text : "Add", id : `${idPrefix}-add-button`, margin:"20 0 0 0"}//TODO i18n
+            ]
+        });
+        
+        //Contents
+        let contentsBlock = {
+            type : "container", layout : "flow",
+            items : [
+                { type : "container", layout : "stack", items:[
+                    {type : "label", text : "Contents" },
+                    {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, autoResize : true, /*minWidth : input1width,*/ /*layout:"stack",*/ style:`width:${400}px`, items: []}
+                ]},
+                
+                { type : "container", layout : "stack", items:[
+                    { type : "label", text:"invisible", style:"color : transparent"},
+                    { type : "button", text : "Delete" } //TODO i18n
+                ]}
+            ]
+        };
+
+        return {
+            title: replace ? "Replace" : "Entries", //TODO i18n
+            type: 'container',
+            minHeight : 300,
+            //autoresize : true,
+            items: [
+                editorBlock,
+                contentsBlock
+            ]
+        };
+    }
+    
     createAboutTab( checker : IGrammarChecker ) {
         return {
             type  : 'container',

@@ -1,5 +1,6 @@
+import * as $ from "jquery";
 import {TinyMCESettingsWindowFactory} from "./ui/TinyMCESettingsWindowFactory";
-import {IGrammarChecker, IGrammarCheckerConstructor} from "./interfaces/IGrammarChecker";
+import {DictionaryEntry, IGrammarChecker, IGrammarCheckerConstructor} from "./interfaces/IGrammarChecker";
 
 import Editor = TinyMCE.Editor;
 import Button = TinyMCE.Button;
@@ -105,25 +106,60 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
 
         openSettingsWindow() {
             let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker );
-            let window = editor.windowManager.open( descriptorObj );
-            //let enableDisableButton = window.find('#rtgEnableDisableButton');
-            //let syncEnableDisableButtonLabel = ()=> enableDisableButton.text(this.grammarChecker.isActivated() ? "Disable" : "Enable" );// TODO use i18n
-
-            //syncEnableDisableButtonLabel();
-
-            window.on('submit', (e)=>{
+            let settingsWindow = editor.windowManager.open( descriptorObj );
+            
+            let $win = $(settingsWindow.$el[0]);
+            let $find = (query)=>$(settingsWindow.$.find(query, settingsWindow.$el[0])[0]);
+            
+            let $dictionaryContainer = $find("#dictionary-contents-container>.mce-container-body");// $(settingsWindow.$.find("#dictionary-contents-container>.mce-container-body", settingsWindow.$el[0])[0]);
+            let $replaceContainer = $find("#replace-contents-container>.mce-container-body");
+            let $addDictionaryBtn = $find("#dictionary-add-button");
+            
+            
+            settingsWindow.on('submit', (e)=>{
                 this.grammarChecker.setSettings( e.data );
             });
-
-            /*enableDisableButton.on('click', ()=>{
-                if( this.grammarChecker.isActivated() ){
-                    this.grammarChecker.deactivate();
-                } else {
-                    this.grammarChecker.activate();
-                }
-                syncEnableDisableButtonLabel();
-            });*/
+            
+            let $dictionaryListbox;
+            let $replaceListbox;
+            
+            let reInitUI = ()=>{
+                $win.off("click", "#dictionary-add-button");
+                
+                $win.on("click", "#dictionary-add-button", ()=>{
+                    //TODO lock interface
+                    
+                });
+                
+                //$addDictionaryBtn.off();
+                //$addDictionaryBtn.on('click', ()=>{
+                    
+                //});
+            };
+            
+            let reloadDictionary = ()=>this.grammarChecker
+                .getDictionaryEntries()
+                .then(( entries =>{
+                    $replaceListbox = createListBox( entries.filter(e=>!!e.Replacement) );
+                    $dictionaryListbox = createListBox( entries.filter(e=>!e.Replacement) );
+                    
+                    $dictionaryContainer.empty().append( $dictionaryListbox );
+                    $replaceContainer.empty().append( $replaceListbox );
+                    
+                    reInitUI();
+                }));
+            
+            let createListBox = (items : DictionaryEntry[])=>$("<select>")
+                .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
+                .attr({ multiple : false, size : 10 })
+                .append(items.map(i=>{
+                   return $("<option>").attr("id", i.Id ).text( `${i.Word} ${ i.Replacement? `( Replace with "${i.Replacement}")` : "" }` ) 
+                }));
+                
+            
+            reloadDictionary();
         }
     }
-
+    
+    
 });
