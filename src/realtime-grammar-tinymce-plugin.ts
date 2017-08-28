@@ -203,7 +203,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
                 .catch(()=>{
-                    this.editor.windowManager.alert("Sorry! Error");
+                    this.editor.windowManager.alert("An error occurred during loading. Please try again");
                     this.activateUI();
                 })
         }
