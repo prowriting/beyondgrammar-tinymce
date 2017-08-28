@@ -110,11 +110,12 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             
             let $win = $(settingsWindow.$el[0]);
             
-            let dictionaryController = new DictionaryController(editor, this.grammarChecker, $win, false);
-            let replaceController = new DictionaryController(editor, this.grammarChecker, $win, true);
+            let dictionaryController = new DictionaryController(editor,settingsWindow,  this.grammarChecker, $win, false);
+            let replaceController = new DictionaryController(editor, settingsWindow, this.grammarChecker, $win, true);
             
             settingsWindow.on('submit', (e)=>{
                 this.grammarChecker.setSettings( e.data );
+                
                 dictionaryController.destroy();
                 replaceController.destroy();
             });
@@ -133,7 +134,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         
         private lastLoadedEntries : DictionaryEntry[] = [];
         
-        constructor(private editor : Editor, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
+        constructor(private editor : Editor, private settingsWindow, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
             this.PREFIX = isReplace ? "replace" : "dictionary";
             this.initUI();
             this.reloadDictionary(true);
@@ -149,8 +150,8 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             
             this.$listBox = $("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
-                .attr({ multiple : false, size : 10 })
-                .appendTo(this.$itemContainer);
+                .attr({ multiple : false, size : 11 })
+                .appendTo( this.$itemContainer );
             
             this.$addButton.on("click", ()=>this.addToDictionary() );
             this.$deleteButton.on("click", ()=>this.deleteFromDictionary() );
