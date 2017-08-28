@@ -79,31 +79,27 @@ export class TinyMCESettingsWindowFactory{
             items : <any>[]
         };
 
-        //let buttonWidth = width * 0.5;
-        //let input1width = (width - buttonWidth)/2;
-
-        
         //Editor block, entity/replace with / add inputs
 
         editorBlock.items.push({
             type : "container", layout : "stack", items : [
                 {type : "label", text : replace ? "Replace" : "Entity"},//TODO i18n
-                {type : "textbox" , id:`${idPrefix}-entry-textbox`, style: replace ? "width : 201px" : "width : 414px" /*autoResize : true, width : input1width*/}
+                {type : "textbox" , id:`${idPrefix}-entry-textbox`, style: replace ? "width : 201px" : "width : 414px"}
             ]});
         
         if( replace ) {
             editorBlock.items.push({
-                type : "container", /*autoResize : true, width : input1width,*/ layout:"stack", items : [
+                type : "container", layout:"stack", items : [
                     {type : "label", text : "With"},//TODO i18n
                     {type : "textbox", id : `${idPrefix}-replace-textbox` ,style : "width : 201px" }
                 ]})
         }
         
         editorBlock.items.push({
-            type : "container",layout : "stack", /*width : buttonWidth, classes :"button",*/
+            type : "container",layout : "stack",
             items : [
                 { type :"label", text:"Invisible", style:"color:transparent" },
-                { type: "button", text : "Add", id : `${idPrefix}-add-button`/*, margin:"20 0 0 0"*/}//TODO i18n
+                { type: "button", text : "Add", id : `${idPrefix}-add-button`, style : "width : 56px"}//TODO i18n
             ]
         });
         
@@ -113,7 +109,7 @@ export class TinyMCESettingsWindowFactory{
             items : [
                 { type : "container", layout : "stack", items:[
                     {type : "label", text : "Contents" },
-                    {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, /*autoResize : true,*/ style:`width:425px`, items: []}
+                    {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, style:`width:425px`}
                 ]},
                 
                 { type : "container", layout : "stack", items:[
