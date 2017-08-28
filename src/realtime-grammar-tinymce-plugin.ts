@@ -150,7 +150,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             
             this.$listBox = $("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
-                .attr({ multiple : false, size : 11 })
+                .attr({ multiple : false, size : 10 })
                 .appendTo( this.$itemContainer );
             
             this.$addButton.on("click", ()=>this.addToDictionary() );
