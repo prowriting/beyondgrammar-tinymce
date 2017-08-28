@@ -84,14 +84,14 @@ export class TinyMCESettingsWindowFactory{
         editorBlock.items.push({
             type : "container", layout : "stack", items : [
                 {type : "label", text : replace ? "Replace" : "Entity"},//TODO i18n
-                {type : "textbox" , id:`${idPrefix}-entry-textbox`, style: (replace ? "width : 177px; margin-right : 10px" : "width : 375px")}
+                {type : "textbox" , name:`${idPrefix}-entry-textbox`, style: (replace ? "width : 177px; margin-right : 10px" : "width : 375px")}
             ]});
         
         if( replace ) {
             editorBlock.items.push({
                 type : "container", layout:"stack", items : [
                     {type : "label", text : "With"},//TODO i18n
-                    {type : "textbox", id : `${idPrefix}-replace-textbox` ,style : "width : 176px" }
+                    {type : "textbox", name : `${idPrefix}-replace-textbox` ,style : "width : 176px" }
                 ]})
         }
         
@@ -99,7 +99,7 @@ export class TinyMCESettingsWindowFactory{
             type : "container",layout : "stack",
             items : [
                 { type :"label", text:"Invisible", style:"color:transparent" },
-                { type: "button", text : "Add", id : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}//TODO i18n
+                { type: "button", text : "Add",  name : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}//TODO i18n
             ]
         });
         
@@ -114,7 +114,7 @@ export class TinyMCESettingsWindowFactory{
                 
                 { type : "container", layout : "stack", items:[
                     { type : "label", text:"invisible", style:"color : transparent"},
-                    { type : "button", id : `${idPrefix}-delete-button`, text : "Delete", style : "margin-left : 10px" } //TODO i18n
+                    { type : "button", name : `${idPrefix}-delete-button`, text : "Delete", style : "margin-left : 10px" } //TODO i18n
                 ]}
             ]
         };

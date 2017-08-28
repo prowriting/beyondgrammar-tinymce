@@ -83,6 +83,8 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             if( this.grammarChecker.getSettings().checkerIsEnabled ) {
                 this.grammarChecker.activate();
             }
+            
+            this.openSettingsWindow();
         }
 
         configureAndBindToolbarButton() {
@@ -105,7 +107,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         }
 
         openSettingsWindow() {
-            let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker );
+            let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker, 2);
             let settingsWindow = editor.windowManager.open( descriptorObj );
             
             let $win = $(settingsWindow.$el[0]);
@@ -124,41 +126,45 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
     
     class DictionaryController {
         private PREFIX : string;
-        private $itemContainer : JQuery;
+        
         private $listBox : JQuery;
         
-        private $entryInput : JQuery;
-        private $replaceWithInput : JQuery;
-        private $addButton : JQuery;
-        private $deleteButton : JQuery;
+        private mce_entryInput : any;
+        private mce_replaceWithInput : any;
+        private mce_addButton : any;
+        private mce_deleteButton : JQuery;
         
         private lastLoadedEntries : DictionaryEntry[] = [];
         
         constructor(private editor : Editor, private settingsWindow, private grammarChecker : IGrammarChecker, private $window, private isReplace : boolean){
             this.PREFIX = isReplace ? "replace" : "dictionary";
             this.initUI();
-            this.reloadDictionary(true);
+            this.reloadDictionary(true).catch(()=>{
+                this.activateUI();
+            })
         }
         
         private initUI(){
-            this.$itemContainer = this.$window.find(`#${this.PREFIX}-contents-container>.mce-container-body`);
-            this.$addButton = this.$window.find(`#${this.PREFIX}-add-button`);
-            this.$deleteButton = this.$window.find(`#${this.PREFIX}-delete-button`);
+            let byId = (id)=>this.settingsWindow.find(`#${id}`)[0];
             
-            this.$entryInput = this.$window.find(`#${this.PREFIX}-entry-textbox`);
-            this.$replaceWithInput = this.$window.find(`#${this.PREFIX}-replace-textbox`);
-            
+            this.mce_addButton    = byId(`${this.PREFIX}-add-button`);
+            this.mce_deleteButton = byId(`${this.PREFIX}-delete-button`);
+            this.mce_entryInput = byId(`${this.PREFIX}-entry-textbox`);
+            this.mce_replaceWithInput = byId(`${this.PREFIX}-replace-textbox`);
+
+            let $itemsContainer = $(this.settingsWindow.$el[0]).find(`#${this.PREFIX}-contents-container>.mce-container-body`);
             this.$listBox = $("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
                 .attr({ multiple : false, size : 10 })
-                .appendTo( this.$itemContainer );
+                .appendTo( $itemsContainer );
             
-            this.$addButton.on("click", ()=>this.addToDictionary() );
-            this.$deleteButton.on("click", ()=>this.deleteFromDictionary() );
+            
+            this.mce_addButton.on("click", ()=>this.addToDictionary() );
+            this.mce_deleteButton.on("click", ()=>this.deleteFromDictionary() );
         }
         
         private addToDictionary(){
-            let word = this.$entryInput.val();
+            let word = this.mce_entryInput.value();
             
             if( !word ){
                 this.editor.windowManager.alert( `Please type ${this.isReplace ? "replace" : "entity"} for adding to dictionary` );
@@ -170,7 +176,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 return;
             }
             
-            let replaceWith = this.isReplace ? this.$replaceWithInput.val() : undefined;
+            let replaceWith = this.isReplace ? this.mce_replaceWithInput.value() : undefined;
             
             if( this.isReplace && !replaceWith ){
                 this.editor.windowManager.alert( "Please type replace for adding to dictionary" );
@@ -187,10 +193,10 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 return;
             }
             
-            this.$entryInput.val("");
-            this.$replaceWithInput.val("");
+            this.mce_entryInput.value("");
+            this.isReplace && this.mce_replaceWithInput.value("");
             
-            this.activateUI(false);
+            this.activateUI(false );
             
             this.grammarChecker
                 .addToDictionary(word, replaceWith)
@@ -211,7 +217,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             }
             
             if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
-                this.editor.windowManager.alert("Unknown Id for delete"); //[pavel] - im not sure this is good message
+                this.editor.windowManager.alert("Please select existing item for delete"); //[pavel] - im not sure this is good message
                 return;
             }
             
@@ -248,19 +254,18 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         }
         
         private activateUI(active : boolean = true){
-            //this.$addButton.
-            if( active ) {
-                //TODO
-            } else {
-                //TODO
-            }
+            let state = (mce)=>{
+                mce.active(active);
+                mce.disabled(!active);
+            };
+            
+            state(this.mce_addButton);
+            state(this.mce_deleteButton);
         }
         
         destroy(){
             //TODO destroy
         }
-        
-        
     }
     
 });
