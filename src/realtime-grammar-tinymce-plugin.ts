@@ -181,7 +181,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
                 .catch(()=>{
-                    this.editor.windowManager.alert("An error occurred during loading. Please try again");
+                    this.editor.windowManager.alert("An error occurred during loading. Please try again");//TODO i18n
                     this.activateUI();
                 })
         }
@@ -202,7 +202,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
                 .catch(()=>{
-                    this.editor.windowManager.alert("Sorry! Error");
+                    this.editor.windowManager.alert("An error occurred during loading. Please try again");//TODO i18n
                     this.activateUI();
                 })
         }
@@ -246,24 +246,24 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         private getErrorMessageForAddToDictionary( word : string, replaceWith : string) : string {
             if( this.isReplace ) {
                 if( !word || !replaceWith ){
-                    return "Please enter a term to replace and a replacement value.";
+                    return "Please enter a term to replace and a replacement value.";//TODO i18n
                 }
 
                 if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase() && e.Replacement.toLowerCase() == replaceWith.toLowerCase()).length > 0 ){
-                    return `Replacement "${word}=>${replaceWith}" already exists in the dictionary`;
+                    return `Replacement "${word}=>${replaceWith}" already exists in the dictionary`;//TODO i18n
                 }
 
                 if( word == replaceWith ) {
-                    return "What is the sense to replace one word with the same?";
+                    return "What is the sense to replace one word with the same?";//TODO i18n
                 }
 
             } else {
                 if( !word ){
-                    return `Please enter a word to add to the dictionary.`;
+                    return `Please enter a word to add to the dictionary.`;//TODO i18n
                 }
 
                 if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
-                    return `"${word}" already exists in the dictionary`;
+                    return `"${word}" already exists in the dictionary`;//TODO i18n
                 }
             }
 
@@ -272,11 +272,11 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         
         private getErrorMessageForDeleteFromDictionary( id : string) : string{
             if( !id ) {
-                return "Please select item to delete";
+                return "Please select item to delete"; //TODO i18n
             }
 
             if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
-                return "Please select existing item for delete";
+                return "Please select existing item for delete"; //TODO i18n
             }
             
             return null;
