@@ -10,6 +10,7 @@ import GetContentEvent = TinyMCE.GetContentEvent;
 
 import {sanitizeHtmlFromQuery} from "./sanitizeHtmlFromQuery";
 import {tinymceTranslate as t} from "./tinymceTranslate";
+import SetContentEvent = TinyMCE.SetContentEvent;
 
 require('style!css!./styles/tinymce-plugin-styles.css');
 
@@ -17,7 +18,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
 
     let rawSettings = editor.settings.realtime || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
-        sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.95/dist/bundle.js',
+        sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.101/dist/bundle.js',
         serviceUrl : '//rtg.prowritingaid.com',
         i18n       : {en : "./libs/i18n-en.js"}
     }, rawSettings.service );
@@ -77,7 +78,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
 
             this.configureAndBindToolbarButton();
             this.bindPastePatching();
-            this.bindGettingContent();
+            this.bindContentChangeBehavior();
 
             window['Pwa'].sanitizeHtmlFromQuery = sanitizeHtmlFromQuery;
 
@@ -97,10 +98,16 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             });
         }
 
-        bindGettingContent() {
+        bindContentChangeBehavior() {
             this.editor.on('GetContent', (e:GetContentEvent)=>{
                 if( e.format == 'html' ) {
                     e.content = sanitizeHtmlFromQuery('span.pwa-mark', e.content);
+                }
+            });
+            
+            this.editor.on("SetContent", (e:SetContentEvent)=>{
+                if(e.format == 'html') {
+                    this.grammarChecker.checkAll();
                 }
             });
         }

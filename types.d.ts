@@ -110,6 +110,11 @@ declare module TinyMCE {
         format : string;
     }
 
+    interface SetContentEvent extends Event<Editor>{
+        content : string;
+        format : string;
+    }
+
     interface ButtonSettings extends ControlSettings, WidgetSettings{
         icon ?: string|boolean;
         image ?: string;
