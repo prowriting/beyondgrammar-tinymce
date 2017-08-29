@@ -154,7 +154,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             let $itemsContainer = $(this.settingsWindow.$el[0]).find(`#${this.PREFIX}-contents-container>.mce-container-body`);
             this.$listBox = $("<select>")
                 .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
-                .attr({ multiple : false, size : 10 })
+                .attr({ multiple : false, size : 8 })
                 .appendTo( $itemsContainer );
             
             
@@ -217,6 +217,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 this.$listBox.empty().append( items.map((item)=>{
                     return $("<option>")
                         .attr("value", item.Id )
+                        .css({padding : "3px"})
                         .text( `${item.Word}${ item.Replacement? ` => ${item.Replacement}` : "" }` )
                 }));
                 
@@ -280,7 +281,8 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         }
         
         destroy(){
-            //TODO destroy
+            this.mce_addButton.off("click");
+            this.mce_deleteButton.off("click");
         }
     }
     
