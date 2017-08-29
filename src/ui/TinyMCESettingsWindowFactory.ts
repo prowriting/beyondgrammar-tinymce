@@ -120,7 +120,7 @@ export class TinyMCESettingsWindowFactory{
         };
 
         return {
-            title: replace ? "Replace" : "Entries", //TODO i18n
+            title: replace ? "Replacements" : "Dictionary", //TODO i18n
             type: 'container',
             minHeight : 300,
             style : "padding : 10px 20px",

@@ -83,8 +83,6 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             if( this.grammarChecker.getSettings().checkerIsEnabled ) {
                 this.grammarChecker.activate();
             }
-            
-            this.openSettingsWindow();
         }
 
         configureAndBindToolbarButton() {
@@ -106,8 +104,8 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             });
         }
 
-        openSettingsWindow() {
-            let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker, 2);
+        openSettingsWindow(activeTab : number = 0) {
+            let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker, activeTab);
             let settingsWindow = editor.windowManager.open( descriptorObj );
             
             let $win = $(settingsWindow.$el[0]);
@@ -165,31 +163,11 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         
         private addToDictionary(){
             let word = this.mce_entryInput.value();
-            
-            if( !word ){
-                this.editor.windowManager.alert( `Please type ${this.isReplace ? "replace" : "entity"} for adding to dictionary` );
-                return;
-            }
-            
-            if( !this.isReplace &&  this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
-                this.editor.windowManager.alert( "Entity already exists in the dictionary" );
-                return;
-            }
-            
             let replaceWith = this.isReplace ? this.mce_replaceWithInput.value() : undefined;
             
-            if( this.isReplace && !replaceWith ){
-                this.editor.windowManager.alert( "Please type replace for adding to dictionary" );
-                return;
-            }
-            
-            if( this.isReplace && this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase() && e.Replacement.toLowerCase() == replaceWith.toLowerCase()).length > 0 ){
-                this.editor.windowManager.alert(`Replacement "${word}=>${replaceWith}" already exists in the dictionary`);
-                return;
-            }
-            
-            if( this.isReplace && word == replaceWith ) {
-                this.editor.windowManager.alert("What sense to replace one word with the same?");
+            let errorMessage = this.getErrorMessageForAddToDictionary(word, replaceWith);
+            if( errorMessage ) {
+                this.editor.windowManager.alert(errorMessage);
                 return;
             }
             
@@ -210,14 +188,10 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         
         private deleteFromDictionary(){
             let id  = this.$listBox.val();
-
-            if( !id ) {
-                this.editor.windowManager.alert( "Please select item for delete" );
-                return;
-            }
             
-            if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
-                this.editor.windowManager.alert("Please select existing item for delete"); //[pavel] - im not sure this is good message
+            let errorMessage = this.getErrorMessageForDeleteFromDictionary(id);
+            if( errorMessage ) {
+                this.editor.windowManager.alert(errorMessage);
                 return;
             }
             
@@ -261,6 +235,51 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             
             state(this.mce_addButton);
             state(this.mce_deleteButton);
+        }
+
+        /**
+         * Returns error message if there is error and null if not
+         * @param {string} word
+         * @param {string} replaceWith
+         * @returns {string}
+         */
+        private getErrorMessageForAddToDictionary( word : string, replaceWith : string) : string {
+            if( this.isReplace ) {
+                if( !word || !replaceWith ){
+                    return "Please enter a term to replace and a replacement value.";
+                }
+
+                if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase() && e.Replacement.toLowerCase() == replaceWith.toLowerCase()).length > 0 ){
+                    return `Replacement "${word}=>${replaceWith}" already exists in the dictionary`;
+                }
+
+                if( word == replaceWith ) {
+                    return "What is the sense to replace one word with the same?";
+                }
+
+            } else {
+                if( !word ){
+                    return `Please enter a word to add to the dictionary.`;
+                }
+
+                if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
+                    return `"${word}" already exists in the dictionary`;
+                }
+            }
+
+            return null;
+        }
+        
+        private getErrorMessageForDeleteFromDictionary( id : string) : string{
+            if( !id ) {
+                return "Please select item to delete";
+            }
+
+            if( this.lastLoadedEntries.filter((e)=>e.Id == id).length == 0 ){
+                return "Please select existing item for delete";
+            }
+            
+            return null;
         }
         
         destroy(){
