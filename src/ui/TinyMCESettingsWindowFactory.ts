@@ -29,7 +29,8 @@ export class TinyMCESettingsWindowFactory{
         tabPanel.items.push( this.createLanguageTab(checker) );
         tabPanel.items.push( this.createOptionsTab() );
         tabPanel.items.push( this.createDictionaryTab(false) );
-        tabPanel.items.push( this.createDictionaryTab(true) );
+        // TODO replacements is not implemented yet on the server
+        //tabPanel.items.push( this.createDictionaryTab(true) );
         tabPanel.items.push( this.createAboutTab(checker) );
 
         form.items.push(tabPanel);
