@@ -1,4 +1,4 @@
-# realtimegrammar-tinymce
+# Real-time Grammar checking plugin for TinyMCE editor
 Bring real-time spelling, grammar and style checking into your TinyMCE editor. Perfect for web CMSs, help desk systems and blogs.
 
 ## Why choose our plugin?
