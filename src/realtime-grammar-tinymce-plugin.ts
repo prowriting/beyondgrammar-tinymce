@@ -119,13 +119,13 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
             let $win = $(settingsWindow.$el[0]);
             
             let dictionaryController = new DictionaryController(editor,settingsWindow,  this.grammarChecker, $win, false);
-            let replaceController = new DictionaryController(editor, settingsWindow, this.grammarChecker, $win, true);
+            //let replaceController = new DictionaryController(editor, settingsWindow, this.grammarChecker, $win, true);
             
             settingsWindow.on('submit', (e)=>{
                 this.grammarChecker.setSettings( e.data );
                 
                 dictionaryController.destroy();
-                replaceController.destroy();
+                //replaceController.destroy();
             });
         }
     }
