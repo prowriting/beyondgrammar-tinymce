@@ -19,7 +19,7 @@ export interface IGrammarChecker {
     deactivate();
     isActivated();
     
-    checkAll() : void;
+    checkAll(forceClearCache ?: boolean) : void;
     
     clearMarks(): void;
     reloadMarks(): void;

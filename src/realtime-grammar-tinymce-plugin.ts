@@ -18,7 +18,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
 
     let rawSettings = editor.settings.rtgOptions || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
-        sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.114/dist/bundle.js',
+        sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.115/dist/bundle.js',
         serviceUrl : '//rtg.prowritingaid.com',
         i18n       : {en : "./libs/i18n-en.js"}
     }, rawSettings.service );
