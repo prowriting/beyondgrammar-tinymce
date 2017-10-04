@@ -16,7 +16,7 @@ require('style!css!./styles/tinymce-plugin-styles.css');
 
 tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
-    let rawSettings = editor.settings.rtgOptions || { service : {}, grammar : {} };
+    let rawSettings = editor.settings.bgOptions || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
         sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.115/dist/bundle.js',
         serviceUrl : '//rtg.prowritingaid.com',
