@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real-time Grammar service for TinyMCE </title>
+    <title>BeyondGrammar service for TinyMCE </title>
 
 </head>
 <body>
@@ -45,17 +45,17 @@
 </div>
 
 <script src='//cdn.tinymce.com/4/tinymce.js'></script>
-<script src="realtime-grammar-plugin.js"></script>
+<script src="beyond-grammar-plugin.js"></script>
 <script>
 
     tinymce.init({
         selector : '#editor',
-        plugins: ["paste", "realtime", "code"],
+        plugins: ["paste", "BeyondGrammar", "code"],
         rtgOptions : {
             
             service : {
                 i18n : { en : "/i18n-en.js" },
-                userId : 'realtime-grammar',
+                userId : 'BeyondGrammar',
                 apiKey: 'E8FEF7AE-3F36-4EAF-A451-456D05E6F2A3'
             },
             
@@ -63,7 +63,7 @@
         },
 
         toolbar: [
-            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | realtime"
+            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | BeyondGrammar"
         ]
     });
 

@@ -8,7 +8,7 @@ export class TinyMCESettingsWindowFactory{
         width : number, height : number, checker : IGrammarChecker, activeTab : number = 0
     ) : any {
         let window = {
-            title: t('realtime-settings-window-header', checker.getApplicationName(), checker.getApplicationVersion()),
+            title: t('beyond-settings-window-header', checker.getApplicationName(), checker.getApplicationVersion()),
             width, height,
             layout : 'fit',
             items : []
@@ -42,15 +42,15 @@ export class TinyMCESettingsWindowFactory{
 
     createLanguageTab(checker : IGrammarChecker) {
         return {
-            title: t('realtime-language-tab-label'),
+            title: t('beyond-language-tab-label'),
             type : "form",
             items : [
-                {type : "checkbox" , name: "checkSpelling",    text : t('realtime-check-spelling-label') },
-                {type : "checkbox" , name: "checkGrammar",     text : t('realtime-check-grammar-label')  },
-                {type : "checkbox" , name: "checkStyle",       text : t('realtime-check-style-label')    },
+                {type : "checkbox" , name: "checkSpelling",    text : t('beyond-check-spelling-label') },
+                {type : "checkbox" , name: "checkGrammar",     text : t('beyond-check-grammar-label')  },
+                {type : "checkbox" , name: "checkStyle",       text : t('beyond-check-style-label')    },
 
                 {
-                    type : 'listbox',  name : 'languageIsoCode', label : t('realtime-select-language-label'),
+                    type : 'listbox',  name : 'languageIsoCode', label : t('beyond-select-language-label'),
                     values : checker
                         .getAvailableLanguages()
                         .map((l:ILanguage)=>({type : 'menuitem',  text : l.displayName, value : l.isoCode }))
@@ -61,12 +61,12 @@ export class TinyMCESettingsWindowFactory{
 
     createOptionsTab() {
         return {
-            type : 'form', title: t('realtime-options-tab-label'),
+            type : 'form', title: t('beyond-options-tab-label'),
             items: [
-                {type : "checkbox",  name: "checkerIsEnabled", text : t("realtime-checker-is-enabled" ) },
+                {type : "checkbox",  name: "checkerIsEnabled", text : t("beyond-checker-is-enabled" ) },
                 {
                     type : 'checkbox', name : "showThesaurusByDoubleClick",
-                    text :  t('realtime-double-click-shows-thesaurus')
+                    text :  t('beyond-double-click-shows-thesaurus')
                 },
             ]
         }
@@ -84,14 +84,14 @@ export class TinyMCESettingsWindowFactory{
 
         editorBlock.items.push({
             type : "container", layout : "stack", items : [
-                {type : "label", text : t(`realtime-${ replace ? "replace" : "word" }-input-label`) },
+                {type : "label", text : t(`beyond-${ replace ? "replace" : "word" }-input-label`) },
                 {type : "textbox" , name:`${idPrefix}-entry-textbox`, style: (replace ? "width : 177px; margin-right : 10px" : "width : 375px")}
             ]});
         
         if( replace ) {
             editorBlock.items.push({
                 type : "container", layout:"stack", items : [
-                    {type : "label", text : t('realtime-replace-with-input-label') },
+                    {type : "label", text : t('beyond-replace-with-input-label') },
                     {type : "textbox", name : `${idPrefix}-replace-textbox` ,style : "width : 176px" }
                 ]})
         }
@@ -100,7 +100,7 @@ export class TinyMCESettingsWindowFactory{
             type : "container",layout : "stack",
             items : [
                 { type :"label", text:"Invisible", style:"color:transparent; user-select : none;" },
-                { type: "button", text : t(`realtime-add-${replace?"replacement":"word"}-button-label`),  name : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}
+                { type: "button", text : t(`beyond-add-${replace?"replacement":"word"}-button-label`),  name : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}
             ]
         });
         
@@ -109,19 +109,19 @@ export class TinyMCESettingsWindowFactory{
             type : "container", layout : "flow",
             items : [
                 { type : "container", layout : "stack", items:[
-                    {type : "label", text : t(`realtime-${replace? "replacements" : "dictionary"}-contents-list-label`) },
+                    {type : "label", text : t(`beyond-${replace? "replacements" : "dictionary"}-contents-list-label`) },
                     {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, style:`width:385px`}
                 ]},
                 
                 { type : "container", layout : "stack", items:[
                     { type : "label", text:"Invisible", style:"color:transparent; user-select : none;"},
-                    { type : "button", name : `${idPrefix}-delete-button`, text : t(`realtime-${replace? "replacements" : "dictionary"}-delete-button-label`), style : "margin-left : 10px" }
+                    { type : "button", name : `${idPrefix}-delete-button`, text : t(`beyond-${replace? "replacements" : "dictionary"}-delete-button-label`), style : "margin-left : 10px" }
                 ]}
             ]
         };
 
         return {
-            title: t(`realtime-${replace?"replacements":"dictionary"}-tab-label`),
+            title: t(`beyond-${replace?"replacements":"dictionary"}-tab-label`),
             type: 'container',
             minHeight : 300,
             style : "padding : 10px 20px",
@@ -135,7 +135,7 @@ export class TinyMCESettingsWindowFactory{
     createAboutTab( checker : IGrammarChecker ) {
         return {
             type  : 'container',
-            title : t('realtime-about-tab-label'),
+            title : t('beyond-about-tab-label'),
             layout : 'flow',
             items: [
                 { type : 'container', layout:'stack', items:[

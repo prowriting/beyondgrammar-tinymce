@@ -14,7 +14,7 @@ import SetContentEvent = TinyMCE.SetContentEvent;
 
 require('style!css!./styles/tinymce-plugin-styles.css');
 
-tinymce.PluginManager.add('realtime', function(editor : Editor) {
+tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
     let rawSettings = editor.settings.rtgOptions || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
@@ -23,10 +23,10 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         i18n       : {en : "./libs/i18n-en.js"}
     }, rawSettings.service );
 
-    let plugin : RealtimeGrammarPlugin;
+    let plugin : BeyondGrammarPlugin;
 
 
-    editor.addButton('realtime', {
+    editor.addButton('BeyondGrammar', {
         icon: 'realtime-grammar-toolbar-icon-16 loading',
         onpostrender : (e : Event<Button>)=>{
             loadPlugin(editor, ()=>{
@@ -34,7 +34,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 let element = editor.getBody();
                 let checker = new GrammarChecker(element, serviceSettings, rawSettings.grammar);
 
-                plugin = new RealtimeGrammarPlugin( editor, e.target, checker );
+                plugin = new BeyondGrammarPlugin( editor, e.target, checker );
             });
         }
     });
@@ -60,7 +60,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         });
     };
 
-    class RealtimeGrammarPlugin {
+    class BeyondGrammarPlugin {
         private uiFactory : TinyMCESettingsWindowFactory;
 
         constructor(private editor : Editor, private toolbarButton : Button, private grammarChecker : IGrammarChecker){
@@ -69,7 +69,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.startPlugin())
                 .catch((error)=>{
                     // some errors on init
-                    console.log('RealtimeGrammarChecker', error);
+                    console.log('BeyondGrammarChecker', error);
                 });
         }
 
@@ -88,7 +88,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         }
 
         configureAndBindToolbarButton() {
-            this.toolbarButton.icon('realtime-grammar-toolbar-icon-16');
+            this.toolbarButton.icon('beyond-grammar-toolbar-icon-16');
             this.toolbarButton.on('click', ()=>this.openSettingsWindow());
         }
 
@@ -189,7 +189,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
                 .catch(()=>{
-                    this.editor.windowManager.alert(t("realtime-loading-error"));
+                    this.editor.windowManager.alert(t("beyond-loading-error"));
                     this.activateUI();
                 })
         }
@@ -210,7 +210,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
                 .then(()=>this.reloadDictionary())
                 .then(()=>this.activateUI())
                 .catch(()=>{
-                    this.editor.windowManager.alert(t("realtime-loading-error"));
+                    this.editor.windowManager.alert(t("beyond-loading-error"));
                     this.activateUI();
                 })
         }
@@ -255,24 +255,24 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         private getErrorMessageForAddToDictionary( word : string, replaceWith : string) : string {
             if( this.isReplace ) {
                 if( !word || !replaceWith ){
-                    return t("realtime-empty-terms-for-add-to-dictionary-replacements");
+                    return t("beyond-empty-terms-for-add-to-dictionary-replacements");
                 }
 
                 if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase() && e.Replacement.toLowerCase() == replaceWith.toLowerCase()).length > 0 ){
-                    return t("realtime-input-replacement-already-exists", word, replaceWith);
+                    return t("beyond-input-replacement-already-exists", word, replaceWith);
                 }
 
                 if( word == replaceWith ) {
-                    return t("realtime-added-same-values-for-replace");
+                    return t("beyond-added-same-values-for-replace");
                 }
 
             } else {
                 if( !word ){
-                    return t("realtime-empty-terms-for-add-to-dictionary-word");
+                    return t("beyond-empty-terms-for-add-to-dictionary-word");
                 }
 
                 if( this.lastLoadedEntries.filter((e)=>e.Word.toLowerCase() == word.toLowerCase()).length > 0 ){
-                    return t("realtime-word-already-exists-in-dictionary", word);
+                    return t("beyond-word-already-exists-in-dictionary", word);
                 }
             }
 
@@ -281,7 +281,7 @@ tinymce.PluginManager.add('realtime', function(editor : Editor) {
         
         private getErrorMessageForDeleteFromDictionary( id : string) : string{
             if( !id ) {
-                return t("realtime-item-to-deleted-is-not-selected");
+                return t("beyond-item-to-deleted-is-not-selected");
             }
             
             return null;

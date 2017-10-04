@@ -20,7 +20,7 @@ module.exports = {
     },
 
     entry: {
-        'realtime-grammar-plugin' : "./src/realtime-grammar-tinymce-plugin.ts",
+        'beyond-grammar-plugin' : "./src/beyond-grammar-tinymce-plugin.ts",
          "i18n-en" : "expose?GrammarChecker_lang_en!./src/i18n/en.ts"
     },
 
