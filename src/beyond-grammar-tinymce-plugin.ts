@@ -18,7 +18,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
     let rawSettings = editor.settings.bgOptions || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
-        sourcePath : '//prowriting.azureedge.net/realtimegrammar/1.0.115/dist/bundle.js',
+        sourcePath : '//prowriting.azureedge.net/beyondgrammar/1.0.139/dist/bundle.js',
         serviceUrl : '//rtg.prowritingaid.com',
         i18n       : {en : "./libs/i18n-en.js"}
     }, rawSettings.service );
@@ -30,7 +30,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         icon: 'realtime-grammar-toolbar-icon-16 loading',
         onpostrender : (e : Event<Button>)=>{
             loadPlugin(editor, ()=>{
-                let GrammarChecker : IGrammarCheckerConstructor = window['Pwa'].GrammarChecker;
+                let GrammarChecker : IGrammarCheckerConstructor = window['BeyondGrammar'].GrammarChecker;
                 let element = editor.getBody();
                 let checker = new GrammarChecker(element, serviceSettings, rawSettings.grammar);
 
@@ -80,7 +80,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
             this.bindPastePatching();
             this.bindContentChangeBehavior();
 
-            window['Pwa'].sanitizeHtmlFromQuery = sanitizeHtmlFromQuery;
+            window['BeyondGrammar'].sanitizeHtmlFromQuery = sanitizeHtmlFromQuery;
 
             if( this.grammarChecker.getSettings().checkerIsEnabled ) {
                 this.grammarChecker.activate();

@@ -141,7 +141,7 @@ export class TinyMCESettingsWindowFactory{
                 { type : 'container', layout:'stack', items:[
                     { type : 'container', layout:'flow', items:[
                         { type : "container", style :"width : 128px; height : 128px; margin: 15px;",
-                            html : `<img src="`+checker.getBrandImageUrl()+`" alt="Real-time Grammar Logo"/>` },
+                            html : `<img src="`+checker.getBrandImageUrl()+`" alt="Beyond Grammar Logo"/>` },
                         { type : 'container', layout:'stack', style:"padding : 10px", items:[
                             { type : 'label', style : "margin-top : 10px", text :  checker.getApplicationName() },
                             { type : 'label', style : "margin-top : 10px", text : `v${checker.getApplicationVersion()}` },
