@@ -24,11 +24,17 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
     }, rawSettings.service );
 
     let plugin : BeyondGrammarPlugin;
-
-
+    let onPostRenderAlreadyInvoked = false;
+    
     editor.addButton('BeyondGrammar', {
         icon: 'realtime-grammar-toolbar-icon-16 loading',
         onpostrender : (e : Event<Button>)=>{
+            if( onPostRenderAlreadyInvoked ) {
+                //protecting from word press twice init. https://tommcfarlin.com/wordpress-hooks-firing-twice/
+                return;
+            }
+            onPostRenderAlreadyInvoked = true;
+            
             loadPlugin(editor, ()=>{
                 let GrammarChecker : IGrammarCheckerConstructor = window['BeyondGrammar'].GrammarChecker;
                 let element = editor.getBody();
@@ -160,10 +166,12 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
             let $itemsContainer = $(this.settingsWindow.$el[0]).find(`#${this.PREFIX}-contents-container>.mce-container-body`);
             this.$listBox = $("<select>")
-                .css({ width : "100%", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box" })
-                .attr({ multiple : false, size : 8 })
+                .css({ 
+                    width : "385px", overflow : "auto", border : "1px solid #ccc7c7", boxSizing : "border-box",
+                    height : "185px", "padding" : 0, lineHeight : "initial"
+                })
+                .attr({ size : 8 })
                 .appendTo( $itemsContainer );
-            
             
             this.mce_addButton.on("click", ()=>this.addToDictionary() );
             this.mce_deleteButton.on("click", ()=>this.deleteFromDictionary() );
