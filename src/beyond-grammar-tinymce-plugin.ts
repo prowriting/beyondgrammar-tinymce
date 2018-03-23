@@ -4,6 +4,7 @@ import {DictionaryEntry, IGrammarChecker, IGrammarCheckerConstructor} from "./in
 
 import Editor = TinyMCE.Editor;
 import Button = TinyMCE.Button;
+import ButtonSettings = TinyMCE.Button;
 import Event = TinyMCE.Event;
 import PasteEvent = TinyMCE.PasteEvent;
 import GetContentEvent = TinyMCE.GetContentEvent;
@@ -24,52 +25,46 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
     }, rawSettings.service );
 
     let plugin : BeyondGrammarPlugin;
-    let onPostRenderAlreadyInvoked = false;
+    let alreadyLoaded = false;
     
     editor.addButton('BeyondGrammar', {
-        icon: 'realtime-grammar-toolbar-icon-16 loading',
-        onpostrender : (e : Event<Button>)=>{
-            if( onPostRenderAlreadyInvoked ) {
-                //protecting from word press twice init. https://tommcfarlin.com/wordpress-hooks-firing-twice/
-                return;
-            }
-            onPostRenderAlreadyInvoked = true;
-            
-            loadPlugin(editor, ()=>{
-                let GrammarChecker : IGrammarCheckerConstructor = window['BeyondGrammar'].GrammarChecker;
-                let element = editor.getBody();
-                let checker = new GrammarChecker(element, serviceSettings, rawSettings.grammar);
-
-                plugin = new BeyondGrammarPlugin( editor, e.target, checker );
-            });
-        }
+        icon: 'beyond-grammar-toolbar-icon-16',
+        onpostrender : (e : Event<Button>)=>{ },
+        onclick : () => plugin.openSettingsWindow()        
     });
 
-    let loadPlugin = ( editor : Editor, complete : ()=>void )=>{
-        editor.on('init', ()=>{
-            let scriptLoader = new tinymce.dom.ScriptLoader();
-            //load grammar script
-            scriptLoader.add( serviceSettings.sourcePath );
+    editor.on('init', () => {
+        if( alreadyLoaded ) {
+            //protecting from word press twice init. https://tommcfarlin.com/wordpress-hooks-firing-twice/
+            return;
+        }
+        alreadyLoaded = true;
+        
+        let scriptLoader = new tinymce.dom.ScriptLoader();
+        //load grammar script
+        scriptLoader.add( serviceSettings.sourcePath );
 
-            //load provided i18n files
-            for(let code in serviceSettings.i18n){
-                scriptLoader.add( serviceSettings.i18n[code], ((code)=>
-                        ()=>tinymce.util.I18n.add( code, window[`GrammarChecker_lang_${code}`].default)
-                )(code) );
-            }
+        //load provided i18n files
+        for(let code in serviceSettings.i18n){
+            scriptLoader.add( serviceSettings.i18n[code], ((code)=>
+                    ()=>tinymce.util.I18n.add( code, window[`GrammarChecker_lang_${code}`].default)
+            )(code) );
+        }
 
-            editor.setProgressState(true);
-            scriptLoader.loadQueue(()=>{
-                editor.setProgressState(false);
-                complete()
-            });
+        //editor.setProgressState(true);
+        scriptLoader.loadQueue(()=>{
+            //editor.setProgressState(false);
+            let GrammarChecker : IGrammarCheckerConstructor = window['BeyondGrammar'].GrammarChecker;
+            let element = editor.getBody();
+            let checker = new GrammarChecker(element, serviceSettings, rawSettings.grammar);
+            plugin = new BeyondGrammarPlugin( editor, checker );
         });
-    };
+    });
 
     class BeyondGrammarPlugin {
         private uiFactory : TinyMCESettingsWindowFactory;
 
-        constructor(private editor : Editor, private toolbarButton : Button, private grammarChecker : IGrammarChecker){
+        constructor(private editor : Editor, private grammarChecker : IGrammarChecker){
 
             grammarChecker.init()
                 .then(()=>this.startPlugin())
@@ -79,10 +74,9 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
                 });
         }
 
-        startPlugin() {
+        private startPlugin() {
             this.uiFactory = new TinyMCESettingsWindowFactory();
 
-            this.configureAndBindToolbarButton();
             this.bindPastePatching();
             this.bindContentChangeBehavior();
 
@@ -93,18 +87,13 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
             }
         }
 
-        configureAndBindToolbarButton() {
-            this.toolbarButton.icon('beyond-grammar-toolbar-icon-16');
-            this.toolbarButton.on('click', ()=>this.openSettingsWindow());
-        }
-
-        bindPastePatching() {
+        private bindPastePatching() {
             this.editor.on('PastePreProcess', (e : PasteEvent)=>{
                 e.content = sanitizeHtmlFromQuery('span.pwa', e.content);
             });
         }
 
-        bindContentChangeBehavior() {
+        private bindContentChangeBehavior() {
             this.editor.on('GetContent', (e:GetContentEvent)=>{
                 if( e.format == 'html' ) {
                     e.content = sanitizeHtmlFromQuery('span.pwa-mark', e.content);
@@ -120,27 +109,20 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
         openSettingsWindow(activeTab : number = 0) {
             let descriptorObj = this.uiFactory.createSettingsWindow( 500, 300, this.grammarChecker, activeTab);
-            let settingsWindow = editor.windowManager.open( descriptorObj );
-            
-            let $win = $(settingsWindow.$el[0]);
-            
+            let settingsWindow = editor.windowManager.open( descriptorObj );            
+            let $win = $(settingsWindow.$el[0]);            
             let dictionaryController = new DictionaryController(editor,settingsWindow,  this.grammarChecker, $win, false);
-            //let replaceController = new DictionaryController(editor, settingsWindow, this.grammarChecker, $win, true);
             
             settingsWindow.on('submit', (e)=>{
-                this.grammarChecker.setSettings( e.data );
-                
+                this.grammarChecker.setSettings( e.data );                
                 dictionaryController.destroy();
-                //replaceController.destroy();
             });
         }
     }
     
     class DictionaryController {
-        private PREFIX : string;
-        
-        private $listBox : JQuery;
-        
+        private PREFIX : string;        
+        private $listBox : JQuery;        
         private mce_entryInput : any;
         private mce_replaceWithInput : any;
         private mce_addButton : any;
