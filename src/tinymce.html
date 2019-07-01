@@ -87,7 +87,7 @@
 
     tinymce.init({
         selector : '#editor',
-        plugins: ["paste", "BeyondGrammar", "code"],
+        plugins: ["paste", "BeyondGrammar", "code", 'link'],
         bgOptions : {
             
             service : {
@@ -100,14 +100,14 @@
         },
 
         toolbar: [
-            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | BeyondGrammar"
+            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | BeyondGrammar"
         ]
     });
 
     tinymce.init({
         selector : '#editor2',
         inline: true,
-        plugins: ["paste", "BeyondGrammar", "code"],
+        plugins: ["paste", "BeyondGrammar", "code", 'link'],
         bgOptions : {
             
             service : {
@@ -120,7 +120,7 @@
         },
 
         toolbar: [
-            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | BeyondGrammar"
+            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent link | link | BeyondGrammar"
         ]
     });
 

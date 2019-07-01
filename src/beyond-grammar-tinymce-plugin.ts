@@ -33,7 +33,11 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         onclick : () => plugin.openSettingsWindow()        
     });
 
-    editor.on('init', () => {
+    editor.on('init', (e) => {
+        if( editor['schema'] && editor['schema'].addCustomElements ){
+            editor['schema'].addCustomElements('~pwa');
+        }
+
         if( alreadyLoaded ) {
             //protecting from word press twice init. https://tommcfarlin.com/wordpress-hooks-firing-twice/
             return;
