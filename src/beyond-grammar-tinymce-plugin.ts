@@ -19,7 +19,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
     let rawSettings = editor.settings.bgOptions || { service : {}, grammar : {} };
     let serviceSettings = tinymce.util.Tools.extend({
-        sourcePath : '//cdn.prowritingaid.com/beyondgrammar/release/dist/hayt/bundle.js',
+        sourcePath : '//cdn.prowritingaid.com/beyondgrammar/2.0.2893/dist/hayt/bundle.js',
         serviceUrl : '//rtg.prowritingaid.com',
         i18n       : {en : "./libs/i18n-en.js"}
     }, rawSettings.service );
