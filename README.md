@@ -15,4 +15,4 @@ Our state-of-the-art grammar checker is used by over 500,000 users. It contains 
 ## Integration demo
 ### NOTE: You will need to <a href="http://prowritingaid.com" target="_blank">register</a> to get a API key first (FREE for Individuals)!
 
-<a href="https://jsfiddle.net/prowriting/Lzoapkxs/" target="_blank">JSFiddle Integration Demo</a>
+<a href="https://jsfiddle.net/prowriting/Lzoapkxs/29/" target="_blank">JSFiddle Integration Demo</a>
