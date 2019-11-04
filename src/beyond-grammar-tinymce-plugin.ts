@@ -14,7 +14,7 @@ import {tinymceTranslate as t} from "./tinymceTranslate";
 import SetContentEvent = TinyMCE.SetContentEvent;
 
 require('style!css!./styles/tinymce-plugin-styles.css');
-
+// console.log(tinymce);
 tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
     let rawSettings = editor.settings.bgOptions || { service : {}, grammar : {} };
@@ -26,12 +26,10 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
     let plugin : BeyondGrammarPlugin;
     let alreadyLoaded = false;
-    
-    editor.addButton('BeyondGrammar', {
-        icon: 'beyond-grammar-toolbar-icon-16',
-        onpostrender : (e : Event<Button>)=>{ },
-        onclick : () => plugin.openSettingsWindow()        
-    });
+
+
+
+    addToolbarButton();
 
     editor.on('init', (e) => {
         if( editor['schema'] && editor['schema'].addCustomElements ){
@@ -286,5 +284,21 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
             this.mce_deleteButton.off("click");
         }
     }
-    
+
+    function addToolbarButton() {
+        if( tinymce.majorVersion == '4' ) {
+            editor.addButton('BeyondGrammar', {
+                icon: 'beyond-grammar-toolbar-icon-16',
+                onpostrender : (e : Event<Button>)=>{ },
+                onclick : () => plugin.openSettingsWindow()
+            });
+        } else {
+            editor.ui.registry.addButton('BeyondGrammar', {
+                icon: 'beyond-grammar-toolbar-icon-16',
+                onSetup : (e : Event<Button>)=>{ },
+                onAction : () => plugin.openSettingsWindow()
+            });
+        }
+    }
+
 });
