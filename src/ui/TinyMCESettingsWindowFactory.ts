@@ -25,7 +25,7 @@ export class TinyMCESettingsWindowFactory{
                     tabs : [
                         this.createLanguageTab(checker),
                         this.createOptionsTab(),
-                        // this.createDictionaryTab(false),
+                        this.createDictionaryTab(false),
                         this.createAboutTab(checker)
                     ]
                 },
@@ -106,62 +106,96 @@ export class TinyMCESettingsWindowFactory{
 
     createDictionaryTab( replace : boolean ) {
         let idPrefix = replace ? "replace" : "dictionary";
-        let editorBlock = {
-            type : "container",
-            layout : "flow",
-            items : <any>[]
-        };
-
-        //Editor block, entity/replace with / add inputs
-
-        editorBlock.items.push({
-            type : "container", layout : "stack", items : [
-                {type : "label", text : t(`beyond-${ replace ? "replace" : "word" }-input-label`) },
-                {type : "textbox" , name:`${idPrefix}-entry-textbox`, style: (replace ? "width : 177px; margin-right : 10px" : "width : 375px")}
-            ]});
         
-        if( replace ) {
+        if( this.is5 ) {
+            return {
+                type: "panel",
+                title: t(`beyond-${replace?"replacements":"dictionary"}-tab-label`),
+                items: [
+                    {
+                        type: "label", label: t(`beyond-${replace ? "replace" : "word"}-input-label`), items: []
+                    },
+                    {
+                        type: "bar", items: [
+                            
+                            {type: "input", name: `${idPrefix}-entry-textbox`},
+                            {
+                                type : "button", text : t(`beyond-add-${replace?"replacement":"word"}-button-label`),  name : `${idPrefix}-add-button`
+                            }
+                        ]
+                    },
+
+                    {
+                        type: "bar", items: [
+
+                            { type: "htmlpanel", name : `${replace?"replace":"dictionary"}-contents-container`, style:`width:385px`, html :"<select></select>"},
+                            {
+                                type : "button", name : `${idPrefix}-delete-button`, text : t(`beyond-${replace? "replacements" : "dictionary"}-delete-button-label`)
+                            }
+                        ]
+                    },
+                    
+                    
+                ]
+            }
+        } else {
+            let editorBlock = {
+                type : "container",
+                layout : "flow",
+                items : <any>[]
+            };
+
+            //Editor block, entity/replace with / add inputs
+
             editorBlock.items.push({
-                type : "container", layout:"stack", items : [
-                    {type : "label", text : t('beyond-replace-with-input-label') },
-                    {type : "textbox", name : `${idPrefix}-replace-textbox` ,style : "width : 176px" }
-                ]})
-        }
-        
-        editorBlock.items.push({
-            type : "container",layout : "stack",
-            items : [
-                { type :"label", text:"Invisible", style:"color:transparent; user-select : none;" },
-                { type: "button", text : t(`beyond-add-${replace?"replacement":"word"}-button-label`),  name : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}
-            ]
-        });
-        
-        //Contents
-        let contentsBlock = {
-            type : "container", layout : "flow",
-            items : [
-                { type : "container", layout : "stack", items:[
-                    {type : "label", text : t(`beyond-${replace? "replacements" : "dictionary"}-contents-list-label`) },
-                    {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, style:`width:385px`}
-                ]},
-                
-                { type : "container", layout : "stack", items:[
-                    { type : "label", text:"Invisible", style:"color:transparent; user-select : none;"},
-                    { type : "button", name : `${idPrefix}-delete-button`, text : t(`beyond-${replace? "replacements" : "dictionary"}-delete-button-label`), style : "margin-left : 10px" }
-                ]}
-            ]
-        };
+                type : "container", layout : "stack", items : [
+                    {type : "label", text : t(`beyond-${ replace ? "replace" : "word" }-input-label`) },
+                    {type : "textbox" , name:`${idPrefix}-entry-textbox`, style: (replace ? "width : 177px; margin-right : 10px" : "width : 375px")}
+                ]});
 
-        return {
-            title: t(`beyond-${replace?"replacements":"dictionary"}-tab-label`),
-            type: 'container',
-            minHeight : 300,
-            style : "padding : 10px 20px",
-            items: [
-                editorBlock,
-                contentsBlock
-            ]
-        };
+            if( replace ) {
+                editorBlock.items.push({
+                    type : "container", layout:"stack", items : [
+                        {type : "label", text : t('beyond-replace-with-input-label') },
+                        {type : "textbox", name : `${idPrefix}-replace-textbox` ,style : "width : 176px" }
+                    ]})
+            }
+
+            editorBlock.items.push({
+                type : "container",layout : "stack",
+                items : [
+                    { type :"label", text:"Invisible", style:"color:transparent; user-select : none;" },
+                    { type: "button", text : t(`beyond-add-${replace?"replacement":"word"}-button-label`),  name : `${idPrefix}-add-button`, style : "width : 56px; margin-left : 10px; text-align: center;"}
+                ]
+            });
+
+            //Contents
+            let contentsBlock = {
+                type : "container", layout : "flow",
+                items : [
+                    { type : "container", layout : "stack", items:[
+                            {type : "label", text : t(`beyond-${replace? "replacements" : "dictionary"}-contents-list-label`) },
+                            {type : "container", id : `${replace?"replace":"dictionary"}-contents-container`, style:`width:385px`}
+                        ]},
+
+                    { type : "container", layout : "stack", items:[
+                            { type : "label", text:"Invisible", style:"color:transparent; user-select : none;"},
+                            { type : "button", name : `${idPrefix}-delete-button`, text : t(`beyond-${replace? "replacements" : "dictionary"}-delete-button-label`), style : "margin-left : 10px" }
+                        ]}
+                ]
+            };
+
+            return {
+                title: t(`beyond-${replace?"replacements":"dictionary"}-tab-label`),
+                type: 'container',
+                minHeight : 300,
+                style : "padding : 10px 20px",
+                items: [
+                    editorBlock,
+                    contentsBlock
+                ]
+            };
+        }
     }
     
     createAboutTab( checker : IGrammarChecker ) {
