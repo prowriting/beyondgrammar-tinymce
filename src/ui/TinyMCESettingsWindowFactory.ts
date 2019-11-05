@@ -38,7 +38,8 @@ export class TinyMCESettingsWindowFactory{
             window = {...window, width, height,
                 layout : 'fit',
                 items : []
-            }
+            };
+            
             let form = {
                 type : "form", data : checker.getSettings(), items : [],
                 margin : "0 0 0 0", padding : "0 0 0 0"
@@ -164,27 +165,52 @@ export class TinyMCESettingsWindowFactory{
     }
     
     createAboutTab( checker : IGrammarChecker ) {
-        return {
-            type  : 'panel',
-            title : t('beyond-about-tab-label'),
-            layout : 'flow',
-            items: [
-                /*{ type : 'container', layout:'stack', items:[
-                    { type : 'container', layout:'flow', items:[
-                        { type : "container", style :"width : 128px; height : 128px; margin: 15px;",
-                            html : `<img src="`+checker.getBrandImageUrl()+`" alt="Beyond Grammar Logo"/>` },
-                        { type : 'container', layout:'stack', style:"padding : 10px", items:[
-                            { type : 'label', style : "margin-top : 10px", text :  checker.getApplicationName() },
-                            { type : 'label', style : "margin-top : 10px", text : `v${checker.getApplicationVersion()}` },
-                        ]}
-
-                    ]},
-                    { type : 'container',
-                        html: `Copyright &copy; ${(new Date()).getFullYear()} <a target="_blank" style="color:blue;" href="${checker.getCopyrightUrl()}">${checker.getCopyrightUrl()}</a>`,
-                        style:"margin-left: 10px; float : left; clear: both;"
+        if( this.is5 ) {
+            return {
+                type  : 'panel',
+                title : t('beyond-about-tab-label'),
+                layout : 'flow',
+                items: [
+                    {type  : 'htmlpanel',
+                        title : t('beyond-about-tab-label'),
+                        layout : 'flow',
+                        html : `
+                            <img src="${checker.getBrandImageUrl()}" alt="Beyond Grammar Logo" style="float: left;margin-right: 20px;"/>
+                            
+                            <span style="float: left;">${checker.getApplicationName()}</span>
+                            <br>
+                            <span style="float: left;">${checker.getApplicationVersion()}</span>
+                            
+                            <div style="clear: both;padding-top: 20px;">Copyright &copy; ${(new Date()).getFullYear()} <a target="_blank" style="color:blue;" href="${checker.getCopyrightUrl()}">${checker.getCopyrightUrl()}</a></div>
+                            
+                        ` 
                     }
-                ]}*/
-            ]
+                ]
+            }
+        } else {
+            return {
+                type  : 'panel',
+                title : t('beyond-about-tab-label'),
+                layout : 'flow',
+                items: [
+                    { type : 'container', layout:'stack', items:[
+                            { type : 'container', layout:'flow', items:[
+                                    { type : "container", style :"width : 128px; height : 128px; margin: 15px;",
+                                        html : `<img src="`+checker.getBrandImageUrl()+`" alt="Beyond Grammar Logo"/>` },
+                                    { type : 'container', layout:'stack', style:"padding : 10px", items:[
+                                            { type : 'label', style : "margin-top : 10px", text :  checker.getApplicationName() },
+                                            { type : 'label', style : "margin-top : 10px", text : `v${checker.getApplicationVersion()}` },
+                                        ]}
+
+                                ]},
+                            { type : 'container',
+                                html: `Copyright &copy; ${(new Date()).getFullYear()} <a target="_blank" style="color:blue;" href="${checker.getCopyrightUrl()}">${checker.getCopyrightUrl()}</a>`,
+                                style:"margin-left: 10px; float : left; clear: both;"
+                            }
+                        ]}
+                ]
+            }
+        
         }
     }
 
