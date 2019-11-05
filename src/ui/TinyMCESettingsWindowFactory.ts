@@ -3,39 +3,70 @@ import {ILanguage} from "../interfaces/ILanguage";
 import {tinymceTranslate as t} from "../tinymceTranslate";
 
 export class TinyMCESettingsWindowFactory{
-
+    is5 : boolean;
+    constructor(){
+        this.is5 = tinymce.majorVersion == '5';
+    }
+    
     createSettingsWindow(
         width : number, height : number, checker : IGrammarChecker, activeTab : number = 0
     ) : any {
+        
         let window = {
             title: t('beyond-settings-window-header', checker.getApplicationName(), checker.getApplicationVersion()),
-            width, height,
-            layout : 'fit',
-            items : []
+            items : null
         };
+        
+        if( this.is5 ) {
+            window = {...window,
+                initialData:checker.getSettings(),
+                body : {
+                    type : "tabpanel",
+                    tabs : [
+                        this.createLanguageTab(checker),
+                        this.createOptionsTab(),
+                        // this.createDictionaryTab(false),
+                        this.createAboutTab(checker)
+                    ]
+                },
+                buttons:[
+                    { type : "submit", text : "Ok" },
+                    { type: "cancel", text: "Cancel"}
+                ]
+            };
+        } else {
+            window = {...window, width, height,
+                layout : 'fit',
+                items : []
+            }
+            let form = {
+                type : "form", data : checker.getSettings(), items : [],
+                margin : "0 0 0 0", padding : "0 0 0 0"
+            };
+            let tabPanel = {
+                type : "tabpanel",
+                activeTab,
+                layout : 'fit',
+                items: []
+            };
 
-        let form = {
-            type : "form", data : checker.getSettings(), items : [],
-            margin : "0 0 0 0", padding : "0 0 0 0"
-        };
+            tabPanel.items.push( this.createLanguageTab(checker) );
+            tabPanel.items.push( this.createOptionsTab() );
+            tabPanel.items.push( this.createDictionaryTab(false) );
+            // TODO replacements is not implemented yet on the server
+            //tabPanel.items.push( this.createDictionaryTab(true) );
+            tabPanel.items.push( this.createAboutTab(checker) );
 
-        let tabPanel = {
-            type : "tabpanel",
-            activeTab,
-            layout : 'fit',
-            items: []
-        };
+            form.items.push(tabPanel);
 
-        tabPanel.items.push( this.createLanguageTab(checker) );
-        tabPanel.items.push( this.createOptionsTab() );
-        tabPanel.items.push( this.createDictionaryTab(false) );
-        // TODO replacements is not implemented yet on the server
-        //tabPanel.items.push( this.createDictionaryTab(true) );
-        tabPanel.items.push( this.createAboutTab(checker) );
+            window.items.push( form );
+        }
+        
+        
 
-        form.items.push(tabPanel);
+        
 
-        window.items.push( form );
+        
 
         return window;
     }
@@ -45,13 +76,13 @@ export class TinyMCESettingsWindowFactory{
             title: t('beyond-language-tab-label'),
             type : "form",
             items : [
-                {type : "checkbox" , name: "checkSpelling",    text : t('beyond-check-spelling-label') },
-                {type : "checkbox" , name: "checkGrammar",     text : t('beyond-check-grammar-label')  },
-                {type : "checkbox" , name: "checkStyle",       text : t('beyond-check-style-label')    },
+                {type : "checkbox" , name: "checkSpelling",    [this.labelFieldName]: t('beyond-check-spelling-label') },
+                {type : "checkbox" , name: "checkGrammar",     [this.labelFieldName] : t('beyond-check-grammar-label')  },
+                {type : "checkbox" , name: "checkStyle",       [this.labelFieldName] : t('beyond-check-style-label')    },
 
                 {
-                    type : 'listbox',  name : 'languageIsoCode', label : t('beyond-select-language-label'),
-                    values : checker
+                    type : this.is5 ? 'selectbox' : "listbox",  name : 'languageIsoCode', label : t('beyond-select-language-label'),
+                    [this.is5 ? "items" : "values"] : checker
                         .getAvailableLanguages()
                         .map((l:ILanguage)=>({type : 'menuitem',  text : l.displayName, value : l.isoCode }))
                 }
@@ -63,10 +94,10 @@ export class TinyMCESettingsWindowFactory{
         return {
             type : 'form', title: t('beyond-options-tab-label'),
             items: [
-                {type : "checkbox",  name: "checkerIsEnabled", text : t("beyond-checker-is-enabled" ) },
+                {type : "checkbox",  name: "checkerIsEnabled", [this.labelFieldName] : t("beyond-checker-is-enabled" ) },
                 {
                     type : 'checkbox', name : "showThesaurusByDoubleClick",
-                    text :  t('beyond-double-click-shows-thesaurus')
+                    [this.labelFieldName] :  t('beyond-double-click-shows-thesaurus')
                 },
             ]
         }
@@ -134,11 +165,11 @@ export class TinyMCESettingsWindowFactory{
     
     createAboutTab( checker : IGrammarChecker ) {
         return {
-            type  : 'container',
+            type  : 'panel',
             title : t('beyond-about-tab-label'),
             layout : 'flow',
             items: [
-                { type : 'container', layout:'stack', items:[
+                /*{ type : 'container', layout:'stack', items:[
                     { type : 'container', layout:'flow', items:[
                         { type : "container", style :"width : 128px; height : 128px; margin: 15px;",
                             html : `<img src="`+checker.getBrandImageUrl()+`" alt="Beyond Grammar Logo"/>` },
@@ -152,9 +183,12 @@ export class TinyMCESettingsWindowFactory{
                         html: `Copyright &copy; ${(new Date()).getFullYear()} <a target="_blank" style="color:blue;" href="${checker.getCopyrightUrl()}">${checker.getCopyrightUrl()}</a>`,
                         style:"margin-left: 10px; float : left; clear: both;"
                     }
-                ]}
+                ]}*/
             ]
         }
     }
 
+    get labelFieldName(){
+        return this.is5 ? "label" : "text"
+    }
 }
