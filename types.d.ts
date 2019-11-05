@@ -35,6 +35,15 @@ declare module TinyMCE {
         getRoot() : HTMLElement;
 
         addButton( name : string, settings : ButtonSettings );
+        
+        //TinyMCE 5 types:
+        
+        ui : {
+            registry : {
+                addButton( name : string, settings : ButtonSettings5);
+                addIcon(name : string, svg : string);
+            }
+        }
     }
 
     interface Element {
@@ -60,6 +69,7 @@ declare module TinyMCE {
     }
 
     interface Static {
+        majorVersion : string;
         PluginManager : PluginManager;
         dom : {
             ScriptLoader : ScriptLoaderConstructor;
@@ -121,6 +131,12 @@ declare module TinyMCE {
         size ?: string;
         onclick ?: ()=>void;
         onpostrender : (e : Event<Button>)=>void;
+    }
+    
+    interface ButtonSettings5 extends ControlSettings, WidgetSettings{
+        icon ?: string;
+        onSetup ?: (e:any)=>void;
+        onAction ?: ()=>void;
     }
 }
 
