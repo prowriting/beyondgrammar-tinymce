@@ -41,6 +41,7 @@ declare module TinyMCE {
         ui : {
             registry : {
                 addButton( name : string, settings : ButtonSettings5);
+                addToggleButton( name : string, settings : ButtonSettings5);
                 addIcon(name : string, svg : string);
             }
         }
@@ -136,7 +137,8 @@ declare module TinyMCE {
     interface ButtonSettings5 extends ControlSettings, WidgetSettings{
         icon ?: string;
         onSetup ?: (e:any)=>void;
-        onAction ?: ()=>void;
+        onAction ?: (e:any)=>void;
+        active ?: boolean;
     }
 }
 
