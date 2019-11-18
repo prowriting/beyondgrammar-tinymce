@@ -27,6 +27,7 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             { from: './src/tinymce.html', to: './' },
+            { from: './src/tinymce5.html', to: './' },
             { context : './src', from: {glob : './icons/**/*'}, to:'./' }
         ])
     ],
