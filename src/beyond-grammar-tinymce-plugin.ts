@@ -324,8 +324,10 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         editor.ui.registry.addToggleButton('BeyondGrammar', {
             icon: 'beyond-grammar-toolbar-icon-16',
             active : false,
+            tooltip : "Beyond Grammar Plugin",
             onSetup : (api)=>{
                 button = api;
+                //This event need for keep button toggled when changed selection, this button's state 
                 editor.on("NodeChange", ()=>{
                     button.setActive( enabled.get() );
                 });
