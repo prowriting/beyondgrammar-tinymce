@@ -13,6 +13,8 @@ import {sanitizeHtmlFromQuery} from "./sanitizeHtmlFromQuery";
 import {tinymceTranslate as t} from "./tinymceTranslate";
 import SetContentEvent = TinyMCE.SetContentEvent;
 
+export const isTinyMCE5 : boolean = tinymce.majorVersion == '5';
+
 require('style!css!./styles/tinymce-plugin-styles.css');
 
 tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
@@ -27,11 +29,11 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
     let plugin : BeyondGrammarPlugin;
     let alreadyLoaded = false;
     
-    editor.addButton('BeyondGrammar', {
-        icon: 'beyond-grammar-toolbar-icon-16',
-        onpostrender : (e : Event<Button>)=>{ },
-        onclick : () => plugin.openSettingsWindow()        
-    });
+    if( isTinyMCE5 ) {
+        addTinyMCE5ToggleButton()
+    } else {
+        addToolbarButton();
+    }
 
     editor.on('init', (e) => {
         if( editor['schema'] && editor['schema'].addCustomElements ){
@@ -68,7 +70,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
     class BeyondGrammarPlugin {
         private uiFactory : TinyMCESettingsWindowFactory;
 
-        constructor(private editor : Editor, private grammarChecker : IGrammarChecker){
+        constructor(private editor : Editor, public grammarChecker : IGrammarChecker){
 
             grammarChecker.init()
                 .then(()=>this.startPlugin())
@@ -88,6 +90,9 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
             if( this.grammarChecker.getSettings().checkerIsEnabled ) {
                 this.grammarChecker.activate();
+                button.setActive(true);
+            } else {
+                button.setActive(false);
             }
         }
 
@@ -286,5 +291,67 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
             this.mce_deleteButton.off("click");
         }
     }
+
+
+    function addToolbarButton() {
+        editor.addButton('BeyondGrammar', {
+            icon: 'beyond-grammar-toolbar-icon-16',
+            onpostrender : (e : Event<Button>)=>{ },
+            onclick : () => plugin.openSettingsWindow()
+        });
+    }
+
+    //region TinyMCE5 
+    let button;
+    let enabled = {
+        get : () => {
+            if( plugin && plugin.grammarChecker ) {
+                return plugin.grammarChecker.getSettings().checkerIsEnabled;
+            }
+            return false;
+        },
+        set : (v) => {
+            if( plugin && plugin.grammarChecker ) {
+                let setting = plugin.grammarChecker.getSettings();
+                setting.checkerIsEnabled = v;
+                plugin.grammarChecker.setSettings( setting );
+            }
+        }
+    };
+
+    function addTinyMCE5ToggleButton() {
+        registerIcon();
+
+        editor.ui.registry.addToggleButton('BeyondGrammar', {
+            icon: 'beyond-grammar-toolbar-icon-16',
+            active : false,
+            tooltip : "Beyond Grammar Plugin",
+            onSetup : (api)=>{
+                button = api;
+                //This event need for keep button toggled when changed selection, this button's state 
+                editor.on("NodeChange", ()=>{
+                    button.setActive( enabled.get() );
+                });
+            },
+            onAction : (api)=>{
+                enabled.set( !api.isActive() );
+            }
+        });
+    }
+
+    function registerIcon() {
+        let icon = require('!url-loader!./icons/realtime-logo-black-16.png');
+        let svgString = `
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                width="16" height="16"
+                >
+                <image x="0px" y="0px" width="16px" height="16px" xlink:href="${icon}" />
+            </svg>`;
+
+        editor.ui.registry.addIcon('beyond-grammar-toolbar-icon-16', svgString);
+    }
+    //endregion
     
 });
