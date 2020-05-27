@@ -353,5 +353,10 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         editor.ui.registry.addIcon('beyond-grammar-toolbar-icon-16', svgString);
     }
     //endregion
-    
+
+    return {
+        getGrammarChecker : function () {
+            return plugin.grammarChecker;
+        }
+    }
 });
