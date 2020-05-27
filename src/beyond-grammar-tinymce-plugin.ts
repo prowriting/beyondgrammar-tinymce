@@ -360,3 +360,66 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         }
     }
 });
+
+tinymce.PluginManager.add('BeyondGrammarHotkeys', function(editor) {
+    editor.on('init', (e) => {
+
+        function getPopup(fn){
+            let correctionPopup = editor.dom.select('pwa-correction-popup.visible')[0];
+            if( correctionPopup ) {
+
+            } else {
+                correctionPopup = document.querySelectorAll("pwa-correction-popup.visible")[0];
+            }
+
+            correctionPopup && fn( correctionPopup );
+        }
+
+        let plugin = editor.plugins.BeyondGrammar;
+
+        //ctlr + ]
+        editor.shortcuts.add("meta+221", "Show Me My Content", function() {
+            plugin.getGrammarChecker().jumpToNextHighlight();
+        });
+
+        //ctrl + N [ 1, 2, 3, 4, 5 ]
+        let NUM_MAX = 5; // 5 is max available key for apply suggestions
+        for( let i = 0; i < NUM_MAX; i++ ) {
+            (function(index, key) {
+                console.log(index, key);
+                editor.shortcuts.add("meta+"+key, "Apply suggestion (" + index + ')', function () {
+                    console.log(">>>", key, index);
+                    getPopup(function (correctionPopup) {
+                        let items = editor.dom.select('.pwa-body-screen:not(.ghost) .pwa-correction', correctionPopup);
+                        $(items[index]).click()
+                    });
+                });
+            })(i, i + 49);
+        }
+
+        //ctrl+~
+        editor.shortcuts.add("meta+192", '', function () {
+            getPopup(function (correctionPopup) {
+                let items = editor.dom.select('.pwa-ignore-button', correctionPopup);
+                if( items.length > 0 ){
+                    $(items[0]).click()
+                }
+            });
+        });
+
+        //ctrl+shift+~
+        editor.shortcuts.add("meta+shift+192", '', function () {
+            getPopup(function (correctionPopup) {
+                let items = editor.dom.select('.pwa-disable-rule-button', correctionPopup);
+                if( items.length > 0 ){
+                    $(items[0]).click()
+                } else {
+                    items = editor.dom.select('.pwa-add-to-dict-button', correctionPopup);
+                    if( items.length > 0 ){
+                        $(items[0]).click();
+                    }
+                }
+            });
+        });
+    });
+});
