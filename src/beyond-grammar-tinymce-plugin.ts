@@ -62,7 +62,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
             //editor.setProgressState(false);
             let GrammarChecker : IGrammarCheckerConstructor = window['BeyondGrammar'].GrammarChecker;
             let element = editor.getBody();
-            let checker = new GrammarChecker(element, serviceSettings, { heavyGrammar:true, ...rawSettings.grammar });
+            let checker = new GrammarChecker(element, serviceSettings, { ...rawSettings.grammar, heavyGrammar:true });
             plugin = new BeyondGrammarPlugin( editor, checker );
         });
     });
