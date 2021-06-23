@@ -354,4 +354,10 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
     }
     //endregion
     
+    if( isTinyMCE5 ){
+        return {
+            enabled : enabled
+        };
+    }
+    
 });
