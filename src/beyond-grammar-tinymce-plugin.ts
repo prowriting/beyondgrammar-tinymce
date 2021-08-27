@@ -85,6 +85,7 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
 
             this.bindPastePatching();
             this.bindContentChangeBehavior();
+            this.bindDestroyEvent();
 
             window['BeyondGrammar'].sanitizeHtmlFromQuery = sanitizeHtmlFromQuery;
 
@@ -113,6 +114,12 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
                 if(e.format == 'html') {
                     this.grammarChecker.checkAll();
                 }
+            });
+        }
+        
+        private bindDestroyEvent() {
+            this.editor.on("detach", ()=>{
+                this.grammarChecker.deactivate();
             });
         }
 
@@ -353,5 +360,11 @@ tinymce.PluginManager.add('BeyondGrammar', function(editor : Editor) {
         editor.ui.registry.addIcon('beyond-grammar-toolbar-icon-16', svgString);
     }
     //endregion
+    
+    if( isTinyMCE5 ){
+        return {
+            enabled : enabled
+        };
+    }
     
 });
